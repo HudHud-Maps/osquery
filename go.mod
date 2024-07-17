@@ -1,4 +1,4 @@
-module github.com/defensestation/osquery
+module github.com/HudHud-Maps/osquery
 
 go 1.22.1
 
