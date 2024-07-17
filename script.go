@@ -20,7 +20,9 @@ func (s ScriptFields) Map() map[string]interface{} {
 		if len(field.params) > 0 {
 			r["params"] = field.params
 		}
-		fields[field.field] = r
+		fields[field.field] = map[string]interface{}{
+			"script": r,
+		}
 	}
 	return fields
 }
