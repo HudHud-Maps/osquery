@@ -3,34 +3,40 @@ package osquery
 type Params map[string]interface{}
 
 type ScriptField struct {
-	field  string
+	name   string
 	source string
 	params Params
 }
 
-type ScriptFields []*ScriptField
-
-func (s ScriptFields) Map() map[string]interface{} {
-	fields := map[string]interface{}{}
-	for _, field := range s {
-		r := map[string]interface{}{}
-		if field.source != "" {
-			r["source"] = field.source
-		}
-		if len(field.params) > 0 {
-			r["params"] = field.params
-		}
-		fields[field.field] = map[string]interface{}{
-			"script": r,
-		}
-	}
-	return fields
+func (s *ScriptField) Name() string {
+	return s.name
 }
 
-func Script(field, source string, params Params) *ScriptField {
-	return &ScriptField{
-		field:  field,
-		source: source,
-		params: params,
+func (s *ScriptField) Map() map[string]interface{} {
+	r := map[string]interface{}{}
+	if s.source != "" {
+		r["source"] = s.source
 	}
+	if len(s.params) > 0 {
+		r["params"] = s.params
+	}
+	return map[string]interface{}{
+		"script": r,
+	}
+}
+
+func Script(name string) ScriptField {
+	return ScriptField{
+		name: name,
+	}
+}
+
+func (s ScriptField) Source(source string) ScriptField {
+	s.source = source
+	return s
+}
+
+func (s ScriptField) Params(params Params) ScriptField {
+	s.params = params
+	return s
 }
