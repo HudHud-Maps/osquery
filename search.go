@@ -30,7 +30,7 @@ type SearchRequest struct {
 	sort         Sort
 	source       Source
 	timeout      *time.Duration
-	scriptFields ScriptFields
+	scriptFields []ScriptField
 }
 
 // Search creates a new SearchRequest object, to be filled via method chaining.
@@ -117,8 +117,8 @@ func (req *SearchRequest) Highlight(highlight Mappable) *SearchRequest {
 	return req
 }
 
-func (req *SearchRequest) ScriptFields(fields ...*ScriptField) *SearchRequest {
-	req.scriptFields = fields
+func (req *SearchRequest) ScriptFields(fields ...ScriptField) *SearchRequest {
+	req.scriptFields = append(req.scriptFields, fields...)
 	return req
 }
 
@@ -163,7 +163,11 @@ func (req *SearchRequest) Map() map[string]interface{} {
 	}
 
 	if req.scriptFields != nil {
-		m["script_fields"] = req.scriptFields.Map()
+		scripts := make(map[string]interface{})
+		for _, script := range req.scriptFields {
+			scripts[script.Name()] = script.Map()
+		}
+		m["script_fields"] = scripts
 	}
 
 	source := req.source.Map()
