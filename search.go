@@ -27,7 +27,7 @@ type SearchRequest struct {
 	postFilter   Mappable
 	query        Mappable
 	size         *uint64
-	sort         Sort
+	sort         []Mappable
 	source       Source
 	timeout      *time.Duration
 	scriptFields []ScriptField
@@ -71,12 +71,13 @@ func (req *SearchRequest) Size(size uint64) *SearchRequest {
 
 // Sort sets how the results should be sorted.
 func (req *SearchRequest) Sort(name string, order Order) *SearchRequest {
-	req.sort = append(req.sort, map[string]interface{}{
-		name: map[string]interface{}{
-			"order": order,
-		},
-	})
+	req.sort = append(req.sort, Sort(name, order))
 
+	return req
+}
+
+func (req *SearchRequest) SortFields(sorts ...Mappable) *SearchRequest {
+	req.sort = append(req.sort, sorts...)
 	return req
 }
 
@@ -144,7 +145,11 @@ func (req *SearchRequest) Map() map[string]interface{} {
 		m["size"] = *req.size
 	}
 	if len(req.sort) > 0 {
-		m["sort"] = req.sort
+		sorted := make([]map[string]interface{}, 0, len(req.sort))
+		for _, s := range req.sort {
+			sorted = append(sorted, s.Map())
+		}
+		m["sort"] = sorted
 	}
 	if req.from != nil {
 		m["from"] = *req.from
