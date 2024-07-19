@@ -104,7 +104,7 @@ func (d *DecayFunction) Map() map[string]interface{} {
 		res["filter"] = d.filter.Map()
 	}
 	if d.multiValueMode != "" {
-		res["multi_value_mode"] = d.multiValueMode
+		res[string(d.function)].(map[string]interface{})["multi_value_mode"] = d.multiValueMode
 	}
 	return res
 }
